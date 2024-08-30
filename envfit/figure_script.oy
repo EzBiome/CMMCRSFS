@@ -1,0 +1,80 @@
+from matplotlib.legend import Legend
+Colors = ['#81DF20','#f04654','#0699c8','#16914C', '#25671c','#cbc037','#cb37c4','#9d0f1e','#6282bd','#06c8c5','#06c887','#06c829']
+
+Arr="/home/michaelnetherland/Agnes_60_Cattle_Poultry/envfit/env_vectors.csv"
+ordi="/home/michaelnetherland/Agnes_60_Cattle_Poultry/envfit/genus_ord.csv"
+
+df=pd.read_csv(ordi)
+df['a'] = df['Sample'].apply(lambda x: x[:3])
+
+
+
+def plot_arrows():
+    j=1
+    textbox=""
+    
+    for key in Arrow.keys():
+        keyName=[]
+        amr=key.strip("\"")
+  
+        letter=amr[0]
+        rest=amr[1:].lower()
+
+        newWord=letter+rest
+        keyName.append(newWord)
+        
+        boxName="/".join(keyName)
+        textbox+=f"{j}. {boxName}\n"
+
+        cca1=float(Arrow[key][0])
+        cca2=float(Arrow[key][1])
+        
+        plt.arrow(0,0,cca1,cca2,width=0.001, color="black")
+        
+        if cca1 < 0:
+            num1=cca1+0.02 
+        else:
+            num1=cca1+0.02
+        if cca2<0:
+            num2=cca2-0.01
+        else:
+            num2=cca2+0.01
+
+
+        plt.annotate(f"{j}.", xy = (num1, num2), fontsize = 12, xytext = (num1, num2), color = 'black')
+        j+=1
+        
+    return textbox
+    
+
+
+labels=["Taxa","Sample"]
+dfs=[]
+
+df=pd.read_csv(ordi)
+df['a'] = df['Sample'].apply(lambda x: x[:3])
+
+with open(Arr,"r") as arr:
+    Arrow={x.split(',')[0]:(x.split(",")[1],x.split(",")[2].strip()) for x in arr if not re.search("Dim",x)}
+
+df['c'] = df["a"].map({i:Colors[c] for c,i in enumerate(list(df["a"].unique()))})
+                          
+for i in list(df["a"].unique()):
+    dfs.append(df.loc[df["a"]==i])
+
+fig, ax = plt.subplots(figsize=(10,10), dpi=200)
+
+for d in dfs:
+    ax.scatter(d["V1"],d["V2"],c=d["c"],label=d["a"].unique()[0])
+
+textbox=plot_arrows()
+
+ax.text(-0.35, 0.75, textbox, transform=ax.transAxes, fontsize=12, verticalalignment='top')
+
+#plt.title(f"Title")
+#plt.xlabel("CCA 1")
+#plt.ylabel("CCA 2")
+
+ax.legend(loc="lower left")
+ax.grid(True)
+fig.savefig(f"/home/michaelnetherland/Agnes_60_Cattle_Poultry/envfit/envfit_amr_genus.png",bbox_inches="tight")
